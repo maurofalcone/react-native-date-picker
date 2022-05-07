@@ -1,0 +1,102 @@
+{
+  "name": "@maurofalcone/react-native-date-picker",
+  "version": "1.0.0",
+  "description": "A simple, customizable and lightweight calendar date picker for react-native",
+  "main": "lib/commonjs/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "bob build",
+    "release": "release-it",
+    "typescript": "tsc --noEmit",
+    "pods": "cd ./src && pod-install --quiet",
+    "bootstrap": "yarn && yarn pods"
+  },
+  "keywords": [
+    "react-native",
+    "react",
+    "date-picker",
+    "calendar",
+    "calendar-picker",
+    "react-native-calendar",
+    "react-native-date-picker",
+    "ios",
+    "android"
+  ],
+  "repository": "https://github.com/maurofalcone/react-native-date-picker",
+  "author": "Mauro Falcone <maurofalcone.95@gmail.com> (https://github.com/maurofalcone)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/maurofalcone/react-native-date-picker/issues"
+  },
+  "homepage": "https://github.com/maurofalcone/react-native-date-picker#readme",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.9",
+    "@types/react-native": "^0.67.6",
+    "@release-it/conventional-changelog": "^2.0.0",
+    "react": "^18.1.0",
+    "react-native": "^0.68.1",
+    "react-native-builder-bob": "^0.18.2",
+    "typescript": "^4.6.4",
+    "release-it": "^14.2.2",
+    "pod-install": "^0.1.0",
+    "husky": "^6.0.0",
+    "jest": "^26.0.1"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  },
+  "react-native": "src/index.ts",
+  "module": "lib/module/index.js",
+  "types": "lib/typescript/src/index.d.ts",
+  "files": [
+    "src",
+    "lib",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__"
+  ],
+  "release-it": {
+    "git": {
+      "commitMessage": "chore: release ${version}",
+      "tagName": "v${version}"
+    },
+    "npm": {
+      "publish": true
+    },
+    "github": {
+      "release": true
+    },
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "preset": "angular"
+      }
+    }
+  },
+  "jest": {
+    "preset": "react-native",
+    "modulePathIgnorePatterns": [
+      "<rootDir>/date-picker/node_modules",
+      "<rootDir>/lib/"
+    ]
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      "commonjs",
+      "module",
+      "typescript"
+    ]
+  },
+  "eslintIgnore": [
+    "node_modules/",
+    "lib/"
+  ],
+  "dependencies": {
+    "npm": "^8.9.0"
+  }
+}
