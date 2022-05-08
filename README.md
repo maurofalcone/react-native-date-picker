@@ -17,12 +17,12 @@ yarn add @maurofalcone/react-native-date-picker
 ## Usage
 
 ```js
-import React { useState } from "react"
+import React, { useState } from "react"
 import { DatePicker, DatePickerProps } from "@maurofalcone/react-native-date-picker"
 
 const [selectedDate, setSelectedDate] = useState(new Date())
 
-<MyDatePicker
+<DatePicker
    onDateChange={(selectedDate) => {
      setSelectedDate(selectedDate)
    }}
