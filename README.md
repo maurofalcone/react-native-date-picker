@@ -24,8 +24,8 @@ const [selectedDate, setSelectedDate] = useState(new Date())
 
 <MyDatePicker
    onDateChange={(selectedDate) => {
-   setSelectedDate(selectedDate)
- }}
+     setSelectedDate(selectedDate)
+   }}
    maxDate={maxDate}
    minDate={minDate}
    selectedDate={
