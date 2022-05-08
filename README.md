@@ -1,4 +1,4 @@
-# react-native-date-picker-test
+# react-native-date-picker [WIP]
 
 A simple, customizable and leightweight calendar date picker for react-native.
 
