@@ -6,202 +6,15 @@ import {
   ViewStyle,
   StyleProp,
 } from "react-native";
-import {
-  DatePickerProps,
-  MappedDate,
-  MissingDatesType,
-  WeekDayType,
-} from "./types";
-
-const weekDays: Array<WeekDayType> = [
-  "Sun",
-  "Mon",
-  "Tue",
-  "Wed",
-  "Thu",
-  "Fri",
-  "Sat",
-];
-
-const missingDates: MissingDatesType = {
-  Sun: {
-    pastDates: 0,
-    nextDates: 6,
-  },
-  Mon: {
-    pastDates: 1,
-    nextDates: 5,
-  },
-  Tue: {
-    pastDates: 2,
-    nextDates: 4,
-  },
-  Wed: {
-    pastDates: 3,
-    nextDates: 3,
-  },
-  Thu: {
-    pastDates: 4,
-    nextDates: 2,
-  },
-  Fri: {
-    pastDates: 5,
-    nextDates: 1,
-  },
-  Sat: {
-    pastDates: 6,
-    nextDates: 0,
-  },
-};
-
-const now = new Date();
-
-const isDisabled = (date: Date, minDate?: Date, maxDate?: Date) => {
-  if (maxDate && !minDate) {
-    return date.getTime() > maxDate.getTime();
-  }
-  if (minDate && !maxDate) {
-    return date.getTime() < minDate.getTime();
-  }
-  if (maxDate && minDate) {
-    return (
-      date.getTime() > maxDate.getTime() || date.getTime() < minDate.getTime()
-    );
-  }
-  return false;
-};
-
-const getDaysInMonth = (
-  year: number,
-  monthIdx: number,
-  minDate?: Date,
-  maxDate?: Date
-): Record<
-  "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat",
-  {
-    date: Date;
-    disabled: boolean;
-    isSameMonth: boolean;
-    isToday: boolean;
-  }[]
-> => {
-  const firstDayOfMonth = new Date(year, monthIdx, 1);
-  const firstDayOfMonthDay = weekDays[firstDayOfMonth.getDay()];
-  const lastDayOfMonth = new Date(year, monthIdx + 1, 0);
-  const lastDayOfMonthDay = weekDays[lastDayOfMonth.getDay()];
-  const currentMonthDaysQty = new Date(year, monthIdx + 1, 0).getDate();
-
-  const daysToLoop =
-    missingDates[firstDayOfMonthDay].pastDates +
-    currentMonthDaysQty +
-    missingDates[lastDayOfMonthDay].nextDates;
-
-  const dates: Record<
-    string,
-    {
-      date: Date;
-      disabled: boolean;
-      isSameMonth: boolean;
-      isToday: boolean;
-    }[]
-  > = {
-    Sun: [],
-    Mon: [],
-    Tue: [],
-    Wed: [],
-    Thu: [],
-    Fri: [],
-    Sat: [],
-  };
-  const date = new Date(year, monthIdx, 1);
-
-  if (missingDates[firstDayOfMonthDay]) {
-    date.setDate(
-      date.getDate() - missingDates[firstDayOfMonthDay].pastDates - 1
-    );
-    for (let i = 1; i <= daysToLoop; i++) {
-      const newDate = new Date(date.setDate(date.getDate() + 1));
-      const disabled = isDisabled(newDate, minDate, maxDate);
-      const isToday = newDate?.toDateString() === now.toDateString();
-      const isSameMonth = newDate?.getMonth() === monthIdx;
-      const obj: {
-        date: Date;
-        disabled: boolean;
-        isSameMonth: boolean;
-        isToday: boolean;
-      } = {
-        date: newDate,
-        disabled,
-        isToday,
-        isSameMonth,
-      };
-      dates[weekDays[obj.date.getDay()]].push(obj);
-    }
-  }
-  return dates;
-};
-
-const getDayStyle = (
-  isDisabled: boolean,
-  isSelected: boolean,
-  isToday: boolean,
-  _isSameMonth: boolean
-) => {
-  return {
-    width: 30,
-    height: 30,
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: isSelected ? "#f50057" : "transparent",
-    borderColor: isToday ? (isDisabled ? "gray" : "#f50057") : "transparent",
-    borderRadius: 100,
-    borderWidth: 1,
-  };
-};
-
-const getDayContainerStyle = (
-  hideDiffMonthDays: boolean,
-  isSameMonth: boolean
-) => {
-  return {
-    width: "100%",
-    backgroundColor:
-      !isSameMonth && !hideDiffMonthDays ? "#808080" : "transparent",
-    justifyContent: "center",
-    alignItems: "center",
-  };
-};
-
-const getDayFontStyle = (
-  isDisabled: boolean,
-  isSelected: boolean,
-  isToday: boolean,
-  isSameMonth: boolean
-) => {
-  let color = "black";
-  if (isSelected) {
-    color = "white";
-  }
-  if (isDisabled) {
-    color = "gray";
-  }
-  if (!isSelected && !isDisabled && isToday && isSameMonth) {
-    color = "#f50057";
-  }
-  if (!isSameMonth) {
-    color = "#AAAAAA";
-  }
-  return {
-    color,
-  };
-};
+import { WEEK_DAYS } from "./constants";
+import { getDaysInMonth, getDayToDisplay, isDisabled } from "./helpers";
+import { getDayContainerStyle, getDayFontStyle, getDayStyle } from "./styles";
+import { DatePickerProps, MappedDate, WeekDayType } from "./types";
 
 export const DatePicker = ({
   maxDate,
   minDate,
-  selectedDate = new Date(),
+  selectedDate,
   onDateChange,
   hideDiffMonthDays = false,
   hideHeader = false,
@@ -284,7 +97,7 @@ export const DatePicker = ({
           flex: 1,
         }}
       >
-        {weekDays.map((wd) => (
+        {WEEK_DAYS.map((wd) => (
           <View
             key={wd}
             style={{
@@ -354,11 +167,11 @@ export const DatePicker = ({
                             isSameMonth
                           )}
                         >
-                          {!hideDiffMonthDays
-                            ? date.getDate()
-                            : isSameMonth
-                            ? date.getDate()
-                            : ""}
+                          {getDayToDisplay(
+                            date.getDate(),
+                            hideDiffMonthDays,
+                            isSameMonth
+                          )}
                         </Text>
                       </TouchableOpacity>
                     </View>
