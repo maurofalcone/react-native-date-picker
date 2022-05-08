@@ -28,9 +28,7 @@ const [selectedDate, setSelectedDate] = useState(new Date())
    }}
    maxDate={maxDate}
    minDate={minDate}
-   selectedDate={
-    new Date(selectedYear, selectedMonthIndex, selectedDay)
-   }
+   selectedDate={selectedDate}
 />
 ```
 
