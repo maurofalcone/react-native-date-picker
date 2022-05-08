@@ -1,6 +1,6 @@
 # react-native-date-picker [WIP]
 
-A simple, customizable and leightweight calendar date picker for react-native.
+A simple, customizable and lightweight calendar date picker for react-native.
 
 ## Installation
 
@@ -23,14 +23,14 @@ import { DatePicker, DatePickerProps } from "@maurofalcone/react-native-date-pic
 const [selectedDate, setSelectedDate] = useState(new Date())
 
 <MyDatePicker
- onDateChange={(selectedDate) => {
-  setSelectedDate(selectedDate)
+   onDateChange={(selectedDate) => {
+   setSelectedDate(selectedDate)
  }}
- maxDate={maxDate}
- minDate={minDate}
- selectedDate={
-  new Date(selectedYear, selectedMonthIndex, selectedDay)
- }
+   maxDate={maxDate}
+   minDate={minDate}
+   selectedDate={
+    new Date(selectedYear, selectedMonthIndex, selectedDay)
+   }
 />
 ```
 
