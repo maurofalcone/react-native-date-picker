@@ -1,6 +1,6 @@
 {
   "name": "@maurofalcone/react-native-date-picker",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A simple, customizable and lightweight calendar date picker for react-native",
   "main": "lib/commonjs/index.js",
   "scripts": {
