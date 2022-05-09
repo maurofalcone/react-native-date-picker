@@ -1,17 +1,33 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ViewStyle,
-  StyleProp,
-} from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { WEEK_DAYS } from "./constants";
-import { getDaysInMonth, getDayToDisplay, isDisabled } from "./helpers";
-import { getDayContainerStyle, getDayFontStyle, getDayStyle } from "./styles";
+import {
+  dayHitSlop,
+  getDaysInMonth,
+  getDayToDisplay,
+  isDisabled,
+  isFunctionType,
+} from "./helpers";
+import {
+  getDayContainerStyle,
+  getDayFontStyle,
+  getDayStyle,
+  styles,
+} from "./styles";
 import { DatePickerProps, MappedDate, WeekDayType } from "./types";
 
+const mappedDatesByDayNameInitialState: Record<WeekDayType, MappedDate[]> = {
+  Sun: [],
+  Mon: [],
+  Tue: [],
+  Wed: [],
+  Thu: [],
+  Fri: [],
+  Sat: [],
+};
+
 export const DatePicker = ({
+  dayStyle,
   maxDate,
   minDate,
   selectedDate,
@@ -19,18 +35,14 @@ export const DatePicker = ({
   hideDiffMonthDays = false,
   hideHeader = false,
   weekDayStyle = {},
+  renderCustomDay,
+  renderCustomHeader,
+  weekDayWrapperStyle,
+  dayParentContainerStyle,
 }: DatePickerProps) => {
-  const [mappedDatesByDayName, setMappedDatesByDayName] = useState<
-    Record<WeekDayType, MappedDate[]>
-  >({
-    Sun: [],
-    Mon: [],
-    Tue: [],
-    Wed: [],
-    Thu: [],
-    Fri: [],
-    Sat: [],
-  });
+  const [mappedDatesByDayName, setMappedDatesByDayName] = useState(
+    mappedDatesByDayNameInitialState
+  );
 
   useEffect(() => {
     if (selectedDate) {
@@ -45,23 +57,12 @@ export const DatePicker = ({
   }, [selectedDate, maxDate, minDate]);
 
   return (
-    <View
-      style={{
-        width: "100%",
-        height: "100%",
-      }}
-    >
-      {!hideHeader && (
-        <View
-          style={{
-            height: 50,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: 10,
-          }}
-        >
-          <TouchableOpacity
+    <View style={styles.main}>
+      {isFunctionType(renderCustomHeader) ? (
+        renderCustomHeader!()
+      ) : !hideHeader ? (
+        <View style={styles.defaultHeader}>
+          <Pressable
             onPress={() =>
               onDateChange(
                 new Date(selectedDate.setMonth(selectedDate.getMonth() - 1))
@@ -69,16 +70,16 @@ export const DatePicker = ({
             }
           >
             <Text>{"<"}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity>
+          </Pressable>
+          <Pressable>
             <Text>
               {selectedDate.toLocaleString("default", { month: "long" })}{" "}
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity>
+          </Pressable>
+          <Pressable>
             <Text>{selectedDate.getFullYear()}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </Pressable>
+          <Pressable
             onPress={() =>
               onDateChange(
                 new Date(selectedDate.setMonth(selectedDate.getMonth() + 1))
@@ -86,47 +87,17 @@ export const DatePicker = ({
             }
           >
             <Text>{">"}</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
-      )}
-      <View
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-around",
-          flex: 1,
-        }}
-      >
+      ) : null}
+      <View style={styles.calendar}>
         {WEEK_DAYS.map((wd) => (
-          <View
-            key={wd}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              height: "100%",
-              flex: 1,
-            }}
-          >
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "10%",
-              }}
-            >
+          <View key={wd} style={styles.daysWrapper}>
+            <View style={[styles.weekDay, weekDayWrapperStyle]}>
               <Text style={weekDayStyle}>{wd}</Text>
             </View>
-            <View
-              style={{
-                flexDirection: "column",
-                justifyContent: "space-around",
-                height: "90%",
-                paddingTop: 15,
-              }}
-            >
-              {(mappedDatesByDayName[wd] as MappedDate[])?.map(
+            <View style={styles.day}>
+              {mappedDatesByDayName[wd]?.map(
                 ({ date, disabled, isSameMonth, isToday }) => {
                   const isSelected =
                     !isDisabled(selectedDate, minDate, maxDate) &&
@@ -134,46 +105,65 @@ export const DatePicker = ({
                   return (
                     <View
                       key={date.toDateString()}
-                      style={
-                        getDayContainerStyle(
-                          hideDiffMonthDays,
-                          isSameMonth
-                        ) as StyleProp<ViewStyle>
-                      }
+                      style={[
+                        getDayContainerStyle(hideDiffMonthDays, isSameMonth),
+                        dayParentContainerStyle?.day,
+                        isSelected && dayParentContainerStyle?.selected,
+                        disabled && dayParentContainerStyle?.disabled,
+                        isToday && dayParentContainerStyle?.today,
+                        !isSameMonth && dayParentContainerStyle?.diffMonth,
+                      ]}
                     >
-                      <TouchableOpacity
-                        style={
-                          getDayStyle(
-                            disabled,
-                            isSelected,
-                            isToday,
-                            isSameMonth
-                          ) as any
-                        }
-                        onPress={() => !disabled && onDateChange(date)}
-                        disabled={disabled || !isSameMonth}
-                        hitSlop={{
-                          top: 10,
-                          left: 8,
-                          right: 8,
-                          bottom: 10,
-                        }}
-                      >
-                        <Text
-                          style={getDayFontStyle(
-                            disabled,
-                            isSelected,
-                            isToday,
-                            isSameMonth
-                          )}
+                      {isFunctionType(renderCustomDay) ? (
+                        renderCustomDay!({
+                          date,
+                          isDisabled: disabled,
+                          isSameMonth,
+                          isSelected,
+                          isToday,
+                        })
+                      ) : (
+                        <Pressable
+                          style={[
+                            getDayStyle(
+                              disabled,
+                              isSelected,
+                              isToday,
+                              isSameMonth
+                            ),
+                            dayStyle?.dayWrapper,
+                            isSelected && dayStyle?.selectedDayWrapper,
+                            disabled && dayStyle?.disabledDayWrapper,
+                            isToday && dayStyle?.todayWrapper,
+                            !isSameMonth && dayStyle?.diffMonthDayWrapper,
+                          ]}
+                          onPress={() => !disabled && onDateChange(date)}
+                          disabled={disabled || !isSameMonth}
+                          hitSlop={dayHitSlop}
                         >
-                          {getDayToDisplay(
-                            date.getDate(),
-                            hideDiffMonthDays,
-                            isSameMonth
-                          )}
-                        </Text>
-                      </TouchableOpacity>
+                          <Text
+                            style={[
+                              getDayFontStyle(
+                                disabled,
+                                isSelected,
+                                isToday,
+                                isSameMonth
+                              ),
+                              dayStyle?.dayText,
+                              isSelected && dayStyle?.selectedDayText,
+                              disabled && dayStyle?.disabledDayText,
+                              isToday && dayStyle?.todayText,
+                              !isSameMonth && dayStyle?.diffMonthDayText,
+                            ]}
+                          >
+                            {getDayToDisplay(
+                              date.getDate(),
+                              hideDiffMonthDays,
+                              isSameMonth
+                            )}
+                          </Text>
+                        </Pressable>
+                      )}
                     </View>
                   );
                 }

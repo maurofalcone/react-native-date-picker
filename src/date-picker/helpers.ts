@@ -77,3 +77,12 @@ export const getDayToDisplay = (
   }
   return "";
 };
+
+export const isFunctionType = (arg: any) => typeof arg === "function";
+
+export const dayHitSlop = {
+  top: 10,
+  left: 8,
+  right: 8,
+  bottom: 10,
+};

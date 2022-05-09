@@ -1,6 +1,28 @@
-import { StyleProp, TextStyle } from "react-native";
+import { StyleProp, TextStyle, ViewStyle } from "react-native";
 
 export type DatePickerProps = {
+  /**
+   * Use this prop if you want to customize the day instead of using a custom function to render the days.
+   */
+  dayStyle?: {
+    dayWrapper?: StyleProp<ViewStyle>;
+    dayText?: StyleProp<TextStyle>;
+    selectedDayWrapper?: StyleProp<ViewStyle>;
+    selectedDayText?: StyleProp<TextStyle>;
+    disabledDayWrapper?: StyleProp<ViewStyle>;
+    disabledDayText?: StyleProp<TextStyle>;
+    todayWrapper?: StyleProp<ViewStyle>;
+    todayText?: StyleProp<TextStyle>;
+    diffMonthDayWrapper?: StyleProp<ViewStyle>;
+    diffMonthDayText?: StyleProp<TextStyle>;
+  };
+  dayParentContainerStyle?: {
+    day?: StyleProp<ViewStyle>;
+    selected?: StyleProp<ViewStyle>;
+    disabled?: StyleProp<ViewStyle>;
+    today?: StyleProp<ViewStyle>;
+    diffMonth?: StyleProp<ViewStyle>;
+  };
   /**
    * dates after maxDate will be disabled.
    */
@@ -29,6 +51,23 @@ export type DatePickerProps = {
    * Overrides day name style.
    */
   weekDayStyle?: StyleProp<TextStyle>;
+  /**
+   * Styles for week day name wrapper.
+   */
+  weekDayWrapperStyle?: StyleProp<TextStyle>;
+  /**
+   * A function to render each day. Hint: don't forget to handle the date change when using this function.
+   */
+  renderCustomDay?: (args: RenderCustomDayArgs) => JSX.Element;
+  renderCustomHeader?: () => JSX.Element;
+};
+
+type RenderCustomDayArgs = {
+  date: Date;
+  isDisabled: boolean;
+  isSameMonth: boolean;
+  isToday: boolean;
+  isSelected: boolean;
 };
 
 export interface MappedDate {
